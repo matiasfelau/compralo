@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
 
@@ -93,5 +94,9 @@ public class ProductoService {
 
     public void descartarProducto(Producto producto) {
         descartados.add(producto);
+    }
+
+    public List<Producto> traerTodos(){
+        return repo.findAll();
     }
 }
