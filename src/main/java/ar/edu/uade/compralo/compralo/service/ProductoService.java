@@ -3,21 +3,32 @@ package ar.edu.uade.compralo.compralo.service;
 import ar.edu.uade.compralo.compralo.model.entity.Producto;
 import ar.edu.uade.compralo.compralo.model.entity.Relacion;
 import ar.edu.uade.compralo.compralo.repository.ProductoRepository;
-import ar.edu.uade.compralo.compralo.utils.PesoUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.*;
 import java.util.HashSet;
 import java.util.List;
-import java.util.PriorityQueue;
 import java.util.Set;
 
 @Service
 @AllArgsConstructor
 public class ProductoService {
+    private final ProductoRepository productoRepository;
+
     private static final Double PESO_INICIAL = 1.0;
-    private final ProductoRepository repo;
-    private final Set<Producto> descartados = new HashSet<>();
+
+    public void agregarProducto(String nombre, Double precio) {
+        productoRepository.save(Producto.builder().nombre(nombre).precio(precio).build());
+    }
+
+    public Producto encontrarProducto(Long id) {
+        return productoRepository.findById(id).orElse(null);
+    }
+
+    public List<Producto> encontrarTodosProductos() {
+        return productoRepository.findAll();
+    }
 
     public void relacionarProductos(Producto productoA, Producto productoB) {
         Relacion relacionExistente = null;
@@ -30,34 +41,35 @@ public class ProductoService {
         }
 
         if (relacionExistente != null) {
-            relacionExistente.setPeso(PesoUtils.calcularPeso(relacionExistente.getPeso()));
+            relacionExistente.setPeso(calcularPeso(relacionExistente.getPeso()));
+            productoRepository.save(productoA);
 
+            productoB = encontrarProducto(productoB.getId());
             for (Relacion relacion : productoB.getRelacionados()) {
                 if (relacion.getProducto().equals(productoA)) {
-                    relacion.setPeso(PesoUtils.calcularPeso(relacion.getPeso()));
+                    relacion.setPeso(calcularPeso(relacion.getPeso()));
                     break;
                 }
             }
+            productoRepository.save(productoB);
         } else {
             productoA.getRelacionados().add(Relacion.builder().producto(productoB).peso(PESO_INICIAL).build());
-            productoB.getRelacionados().add(Relacion.builder().producto(productoA).peso(PESO_INICIAL).build());
-        }
+            productoRepository.save(productoA);
 
-        repo.save(productoA);
-        repo.save(productoB);
+            productoB = encontrarProducto(productoB.getId());
+            productoB.getRelacionados().add(Relacion.builder().producto(productoA).peso(PESO_INICIAL).build());
+            productoRepository.save(productoB);
+        }
     }
 
     /**
-     * Este método utiliza BFS para encontrar, en cascada, los productos relacionados a un producto raiz.
-     * <br>
-     * Se aconseja usar una profundidad igual a 2.
-     *
+     * BFS
      * @param raiz el nodo desde el cual se buscarán productos relacionados.
      * @param profundidad la distancia máxima respecto al nodo ingresado como raiz.
      * @return el conjunto de productos relacionados.
      */
     public Set<Producto> encontrarProductosRelacionados(Producto raiz, int profundidad) {
-        PriorityQueue<Producto> pendiente = new PriorityQueue<>();
+        Queue<Producto> pendiente = new ArrayDeque<>();
         Set<Producto> visitados = new HashSet<>();
         int nivel = 0;
 
@@ -65,38 +77,25 @@ public class ProductoService {
 
         while (!pendiente.isEmpty() && nivel <= profundidad) {
             int n = pendiente.size();
-
             for (int i=0; i < n; i++) {
                 Producto producto = pendiente.poll();
-
                 if (producto != null) {
-                    // Poda: si el nodo actual está descartado, no lo expando
-                    if (descartados.contains(producto)) {
-                        continue;
-                    }
-
-
                     if (!visitados.contains(producto)) {
                         visitados.add(producto);
                         
                         for (Relacion relacion : producto.getRelacionados()) {
-                            repo.findById(relacion.getProducto().getId()).ifPresent(pendiente::add);
+                            productoRepository.findById(relacion.getProducto().getId()).ifPresent(pendiente::add);
                         }
                     }
                 }
             }
-
             nivel++;
         }
 
         return visitados;
     }
 
-    public void descartarProducto(Producto producto) {
-        descartados.add(producto);
-    }
-
-    public List<Producto> traerTodos(){
-        return repo.findAll();
+    private Double calcularPeso(Double peso) {
+        return 1 / (1 / peso + 1);
     }
 }

@@ -1,15 +1,14 @@
 package ar.edu.uade.compralo.compralo.service;
 
 import ar.edu.uade.compralo.compralo.model.entity.Producto;
-import ar.edu.uade.compralo.compralo.utils.ListaUtils;
+import ar.edu.uade.compralo.compralo.utils.DYCUtils;
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
-import org.springframework.stereotype.Service;
 
 
 @Service
@@ -17,46 +16,37 @@ import org.springframework.stereotype.Service;
 public class CarritoService {
     private final RecomendacionService recomendacionService;
     private final ProductoService productoService;
-    private final int MONTOENVIOGRATIS = 33000;
+
+    private static final int MONTO_ENVIO_GRATIS = 400;
+
+    public Set<Producto> obtenerRecomendaciones(Set<Producto> carrito) {
+        return recomendacionService.obtenerRecomendacionesCarrito(carrito);
+    }
+
     /**
-     * Agrega un producto a la lista de descarte.
+     * GREEDY
+     * @param productos
+     * @return
      */
-    public void descartar(Producto producto) {
-        if (producto != null) {
-            recomendacionService.descartarRecomendacion(producto);
-        }
-    }
-
-    public Set<Producto> obtenerRecomendaciones(Set<Producto> productos, int nivel){
-        nivel = nivel/productos.size();
-        for (Producto p: productos){
-            recomendacionService.obtenerRecomendaciones(p,nivel);
-        }
-        return productos;
-
-    }
-
-    public Set<Producto> llenarCarrito (Set<Producto> productos){
+    public Set<Producto> obtenerEnvioGratis(Set<Producto> productos) {
         int suma = 0;
-        Set<Producto> carrito = new HashSet<>();
-        carrito.addAll(productos);
-        for (Producto p: productos){
+        Set<Producto> carrito = new HashSet<>(productos);
+        for (Producto p: productos) {
             suma += p.getPrecio();
-            
         }
-        int restante = MONTOENVIOGRATIS - suma;
-        List<Producto> todosLosProductos = productoService.traerTodos();
-        todosLosProductos = ListaUtils.ordenarLista(todosLosProductos);
+
+        List<Producto> todosLosProductos = productoService.encontrarTodosProductos();
+        todosLosProductos = DYCUtils.ordenarLista(todosLosProductos);
+
         Iterator<Producto> it = todosLosProductos.iterator();
         Producto p = it.next();
-        while (restante < MONTOENVIOGRATIS){
+        while (suma < MONTO_ENVIO_GRATIS) {
           if (!carrito.contains(p)){
                 carrito.add(p);
-                restante += p.getPrecio();
+                suma += p.getPrecio();
             }
             p = it.next();
         }
         return carrito;
     }
-
 }

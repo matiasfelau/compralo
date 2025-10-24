@@ -13,7 +13,6 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Getter
-@Setter
 @EqualsAndHashCode(of = "id")
 public class Producto {
     @Id

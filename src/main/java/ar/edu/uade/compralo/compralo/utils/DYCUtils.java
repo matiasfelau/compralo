@@ -2,33 +2,36 @@ package ar.edu.uade.compralo.compralo.utils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import ar.edu.uade.compralo.compralo.model.entity.Distancia;
 import ar.edu.uade.compralo.compralo.model.entity.Producto;
 
-public class ListaUtils {
+public class DYCUtils {
 
     /**
      *
-     * @param mapa
+     * @param lista
      * @return
      */
-    public static List<Producto> ordenarLista(List<Producto> mapa) {
-        return ordenarListaImpl(mapa, 0, mapa.size());
+    public static List<Producto> ordenarLista(List<Producto> lista) {
+        return ordenarListaImpl(lista, 0, lista.size());
     }
 
     private static List<Producto> ordenarListaImpl(List<Producto> vector, int inicio, int fin) {
-        int longitud = fin - inicio + 1;
+        // 1,2,3 - i:0 f:3 m:1
 
-        if (longitud == 1) {
-            return vector;
+        // 1 - i:0 f:1 ---
+        // 2,3 - i:1 f:3 m:2
+
+        // 2 - i:1 f:2 ---
+        // 3 - i:2 f:3 ---
+        if (inicio == fin - 1) {
+            return new ArrayList<>(vector.subList(inicio, fin));
         }
 
         int mitad = (inicio + fin) / 2;
 
         List<Producto> izquierda = ordenarListaImpl(vector, inicio, mitad);
-        List<Producto> derecha = ordenarListaImpl(vector, mitad + 1, fin);
+        List<Producto> derecha = ordenarListaImpl(vector, mitad, fin);
 
         return fusionarMitades(izquierda, derecha);
     }
