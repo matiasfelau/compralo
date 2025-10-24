@@ -12,7 +12,6 @@ import org.springframework.data.neo4j.core.schema.TargetNode;
 @Builder
 @Getter
 @Setter
-@EqualsAndHashCode(of = "id")
 public class Relacion {
     @Id
     @GeneratedValue
