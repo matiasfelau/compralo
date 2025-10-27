@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito - Compralo</title>
+    <link th:href="@{/css/styles.css}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>Tu Carrito</h1>
+        <a th:href="@{/catalogo.html}" class="btn-carrito">🛍️ Volver al Catálogo</a>
+    </header>
+    <main>
+        <section id="carrito-container">
+            <h2>Artículos en tu Carrito</h2>
+            <div id="lista-carrito">
+                <p>Cargando carrito...</p>
+            </div>
+
+            <div id="resumen-carrito">
+            </div>
+
+            <div id="envio-gratis-section">
+                <button id="btn-envio-gratis" class="btn-secundario">✨ ¿Califico para Envío Gratis?</button>
+                <div id="resultado-envio-gratis">
+                </div>
+            </div>
+
+            <button id="btn-comprar" class="btn-agregar">Finalizar Compra</button>
+
+            <hr>
+
+            <div id="recomendaciones-container">
+                <h3>✨ Productos Recomendados para ti</h3>
+                <div id="lista-recomendaciones" class="grid-recomendaciones">
+                    <p>Cargando sugerencias...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>© 2025 Compralo — Todos los derechos reservados</p>
+    </footer>
+    <script th:src="@{/js/carrito.js}"></script>
+</body>
+</html>

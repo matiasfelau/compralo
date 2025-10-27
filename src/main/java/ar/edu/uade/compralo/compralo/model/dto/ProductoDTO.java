@@ -1,4 +1,4 @@
-package ar.edu.uade.compralo.compralo.dto;
+package ar.edu.uade.compralo.compralo.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

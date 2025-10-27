@@ -34,7 +34,7 @@ public class BTUtils {
         if (posicion == recomendaciones.size()) {
             if (suma < menor && actual.size() == maximo) {
                 menor = suma;
-                mejor = actual;
+                mejor = new ArrayList<>(actual);
             }
             return;
         }
@@ -64,7 +64,7 @@ public class BTUtils {
             backtrack(recomendaciones, posicion, suma, actual, maximo);
 
             suma -= interes;
-            actual.remove(actual.size() - 1);
+            actual.remove(recomendacion);
             backtrack(recomendaciones, posicion, suma, actual, maximo);
         } else backtrack(recomendaciones, posicion, suma, actual, maximo);
     }

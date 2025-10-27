@@ -2,7 +2,6 @@ package ar.edu.uade.compralo.compralo.utils;
 
 import ar.edu.uade.compralo.compralo.model.entity.Producto;
 import ar.edu.uade.compralo.compralo.model.entity.Recomendacion;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,12 +20,28 @@ public class DPUtils {
 
         if (cantidad <= maximo) camino = distancias.keySet();
         else {
-            List<Producto> productos = new ArrayList<>(distancias.keySet());
+            List<Producto> productos = extract(distancias);
             Double[][] solucion = construirSolucion(cantidad, maximo, distancias, productos);
             camino = reconstruirCamino(maximo, solucion, productos);
         }
 
         return transform(camino, distancias);
+    }
+
+    private static List<Producto> extract(Map<Producto, Double> distancias) {
+        Set<Producto> keys = distancias.keySet();
+        List<Producto> productos = new ArrayList<>();
+
+        Producto raiz = keys.stream()
+                .filter(p -> distancias.get(p) == 0.0)
+                .findFirst()
+                .orElse(null);
+
+        productos.add(raiz);
+        keys.remove(raiz);
+        productos.addAll(keys);
+
+        return productos;
     }
 
     private static Double[][] construirSolucion(
@@ -40,7 +55,6 @@ public class DPUtils {
         for (int i = 0; i < n; i++) {
             for (int j = 0; j <= m; j++) {
                 if (j == 0) tabla[i][j] = 0.0;
-//                else if (i == 0) tabla[i][j] = distancias.get(productos.get(i));
                 else if (i == 0) tabla[i][j] = 0.0;
                 else if (i <= j) tabla[i][j] = tabla[i-1][j] + distancias.get(productos.get(i));
                 else tabla[i][j] = min(tabla[i-1][j], tabla[i-1][j-1] + distancias.get(productos.get(i)));
@@ -53,10 +67,8 @@ public class DPUtils {
     private static Set<Producto> reconstruirCamino(int j, Double[][] tabla, List<Producto> productos) {
         Set<Producto> combinacion = new HashSet<>();
 
-        for (int i = tabla.length - 1; i >= 0; i--) {
-            //if (Double.compare(tabla[i][j], 0) == 0) break;
-            if (i == 0) break;
-            else if (Double.compare(tabla[i][j], tabla[i - 1][j]) != 0) {
+        for (int i = tabla.length - 1; i > 0; i--) {
+            if (Double.compare(tabla[i][j], tabla[i - 1][j]) != 0) {
                 combinacion.add(productos.get(i));
                 j--;
             }

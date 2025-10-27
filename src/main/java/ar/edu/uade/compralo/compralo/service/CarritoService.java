@@ -17,7 +17,7 @@ public class CarritoService {
     private final RecomendacionService recomendacionService;
     private final ProductoService productoService;
 
-    private static final int MONTO_ENVIO_GRATIS = 400;
+    private static final int MONTO_ENVIO_GRATIS = 2000;
 
     public Set<Producto> obtenerRecomendaciones(Set<Producto> carrito) {
         return recomendacionService.obtenerRecomendacionesCarrito(carrito);
@@ -31,6 +31,8 @@ public class CarritoService {
     public Set<Producto> obtenerEnvioGratis(Set<Producto> productos) {
         int suma = 0;
         Set<Producto> carrito = new HashSet<>(productos);
+        Set<Producto> resultado = new HashSet<>();
+
         for (Producto p: productos) {
             suma += p.getPrecio();
         }
@@ -42,11 +44,11 @@ public class CarritoService {
         Producto p = it.next();
         while (suma < MONTO_ENVIO_GRATIS) {
           if (!carrito.contains(p)){
-                carrito.add(p);
+                resultado.add(p);
                 suma += p.getPrecio();
             }
             p = it.next();
         }
-        return carrito;
+        return resultado;
     }
 }

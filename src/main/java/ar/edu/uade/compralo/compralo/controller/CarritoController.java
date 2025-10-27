@@ -1,16 +1,18 @@
 package ar.edu.uade.compralo.compralo.controller;
 
-import ar.edu.uade.compralo.compralo.dto.ProductoDTO;
+import ar.edu.uade.compralo.compralo.model.dto.ProductoDTO;
 import ar.edu.uade.compralo.compralo.model.entity.Producto;
 import ar.edu.uade.compralo.compralo.service.CarritoService;
 import ar.edu.uade.compralo.compralo.service.ProductoService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,7 +34,7 @@ public class CarritoController {
     public ResponseEntity<Set<ProductoDTO>> obtenerRecomendaciones(@RequestBody Set<ProductoDTO> carritoDto) {
         Set<Producto> carrito = carritoDto.stream()
                 .map(dto -> dto.getId() == null ? null : productoService.encontrarProducto(dto.getId()))
-                .filter(p -> p != null)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
         Set<Producto> recomendados = carritoService.obtenerRecomendaciones(carrito);
@@ -48,7 +50,7 @@ public class CarritoController {
     public ResponseEntity<Set<ProductoDTO>> obtenerEnvioGratis(@RequestBody Set<ProductoDTO> carritoDto) {
         Set<Producto> carrito = carritoDto.stream()
                 .map(dto -> dto.getId() == null ? null : productoService.encontrarProducto(dto.getId()))
-                .filter(p -> p != null)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
         Set<Producto> seleccion = carritoService.obtenerEnvioGratis(carrito);

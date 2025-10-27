@@ -3,6 +3,7 @@ package ar.edu.uade.compralo.compralo.service;
 import ar.edu.uade.compralo.compralo.model.entity.Producto;
 import ar.edu.uade.compralo.compralo.model.entity.Relacion;
 import ar.edu.uade.compralo.compralo.repository.ProductoRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +31,11 @@ public class ProductoService {
         return productoRepository.findAll();
     }
 
+    @Transactional
     public void relacionarProductos(Producto productoA, Producto productoB) {
+        productoA = encontrarProducto(productoA.getId());
+        productoB = encontrarProducto(productoB.getId());
+
         Relacion relacionExistente = null;
 
         for (Relacion relacion : productoA.getRelacionados()) {
